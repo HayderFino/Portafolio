@@ -54,17 +54,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Tech Items Stagger
+    // Tech Items Stagger - Increased reliability
     gsap.from('.tech-item', {
         scrollTrigger: {
             trigger: '.tech-grid',
-            start: 'top 80%'
+            start: 'top 95%',
+            markers: false
         },
-        y: 30,
+        y: 20,
         opacity: 0,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: 'power2.out'
+        duration: 0.5,
+        stagger: {
+            each: 0.05,
+            from: "start"
+        },
+        ease: 'power1.out',
+        clearProps: "all" // Ensures opacity stays at 1 after animation
     });
 
     // Project Cards Hover & Initial Reveal

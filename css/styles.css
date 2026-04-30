@@ -309,25 +309,28 @@ nav {
 
 .tech-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 2rem;
     text-align: center;
+    width: 100%;
 }
 
 .tech-item {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(20, 20, 20, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 2rem;
     border-radius: 20px;
     transition: all 0.4s ease;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 5;
 }
 
 .tech-item:hover {
     transform: translateY(-8px);
-    border-color: var(--accent-secondary);
-    background: rgba(112, 0, 255, 0.05);
-    box-shadow: 0 10px 25px rgba(112, 0, 255, 0.2);
+    border-color: var(--accent-primary);
+    background: rgba(0, 242, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 242, 255, 0.2);
 }
 
 .tech-item img {
