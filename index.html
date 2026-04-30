@@ -1,34 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hayder Fino | Systems & Data Engineer</title>
-    <meta name="description" content="Portfolio of Hayder Fino, Systems Engineering student specializing in Data Engineering, AI, and IoT solutions.">
-    
+    <meta name="description"
+        content="Portfolio of Hayder Fino, Systems Engineering student specializing in Data Engineering, AI, and IoT solutions.">
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
     <!-- Styles -->
     <link rel="stylesheet" href="css/styles.css">
-    
-    <!-- Skill Icons (External) -->
-    <script src="https://kit.fontawesome.com/your-code.js" crossorigin="anonymous"></script>
-    
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="img/favicon.png">
+
     <!-- 3D and Animation Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 </head>
+
 <body>
     <!-- 3D Canvas Background -->
     <canvas id="bg-canvas"></canvas>
 
     <nav>
         <div class="container nav-content">
-            <div class="logo">HFINO.SYS</div>
+            <div class="logo">HFINO</div>
             <ul class="nav-links">
                 <li><a href="#about">About</a></li>
                 <li><a href="#stack">Stack</a></li>
@@ -42,7 +47,8 @@
         <div class="hero-bg-glow"></div>
         <div class="container hero-content">
             <h1 class="reveal">Hayder <span class="highlight">Fino</span></h1>
-            <p class="hero-subtitle reveal">Systems Engineering Student & Aspiring <span class="highlight">Data Engineer</span> focused on building intelligent, scalable systems.</p>
+            <p class="hero-subtitle reveal">Systems Engineering Student & Aspiring <span class="highlight">Data
+                    Engineer</span> focused on building intelligent, scalable systems.</p>
             <div class="cta-group reveal">
                 <a href="#projects" class="btn-primary">View My Work</a>
             </div>
@@ -52,7 +58,9 @@
     <section id="about" class="container">
         <h2 class="section-title reveal">Professional Profile</h2>
         <div class="profile-content reveal">
-            <p>I am passionate about building **intelligent systems** that combine software development, data pipelines, IoT, and predictive analytics. My goal is to design scalable architectures that transform real-world data into smart decisions.</p>
+            <p>I am passionate about building **intelligent systems** that combine software development, data pipelines,
+                IoT, and predictive analytics. My goal is to design scalable architectures that transform real-world
+                data into smart decisions.</p>
             <div class="interests-grid">
                 <div class="interest-item">🧠 AI & Machine Learning</div>
                 <div class="interest-item">📊 Big Data Architectures</div>
@@ -66,39 +74,39 @@
         <h2 class="section-title reveal">Tech Stack</h2>
         <div class="tech-grid">
             <!-- Data & ML -->
-            <div class="tech-item reveal">
+            <div class="tech-item">
                 <img src="https://skillicons.dev/icons?i=python" alt="Python">
                 <p>Python</p>
                 <div class="tag">NumPy/Pandas</div>
             </div>
             <!-- Backend -->
-            <div class="tech-item reveal">
+            <div class="tech-item">
                 <img src="https://skillicons.dev/icons?i=nodejs" alt="NodeJS">
                 <p>Node.js</p>
             </div>
-            <div class="tech-item reveal">
+            <div class="tech-item">
                 <img src="https://skillicons.dev/icons?i=php" alt="PHP">
                 <p>PHP</p>
             </div>
-            <div class="tech-item reveal">
+            <div class="tech-item">
                 <img src="https://skillicons.dev/icons?i=java" alt="Java">
                 <p>Java</p>
             </div>
             <!-- Database -->
-            <div class="tech-item reveal">
+            <div class="tech-item">
                 <img src="https://skillicons.dev/icons?i=postgresql" alt="PostgreSQL">
                 <p>PostgreSQL</p>
             </div>
-            <div class="tech-item reveal">
+            <div class="tech-item">
                 <img src="https://skillicons.dev/icons?i=mongodb" alt="MongoDB">
                 <p>MongoDB</p>
             </div>
             <!-- Tools -->
-            <div class="tech-item reveal">
+            <div class="tech-item">
                 <img src="https://skillicons.dev/icons?i=docker" alt="Docker">
                 <p>Docker</p>
             </div>
-            <div class="tech-item reveal">
+            <div class="tech-item">
                 <img src="https://skillicons.dev/icons?i=arduino" alt="Arduino">
                 <p>IoT/Edge</p>
             </div>
@@ -108,12 +116,13 @@
     <section id="projects" class="container">
         <h2 class="section-title reveal">Featured Projects</h2>
         <div class="project-grid">
-            
+
             <!-- Project: Territorio Verde -->
-            <div class="project-card reveal">
+            <div class="project-card">
                 <div class="project-status">Web Platform</div>
                 <h3>Territorio Verde</h3>
-                <p>A specialized digital ecosystem for environmental awareness and regional data visualization. Designed to bridge the gap between complex environmental data and public engagement.</p>
+                <p>A specialized digital ecosystem for environmental awareness and regional data visualization. Designed
+                    to bridge the gap between complex environmental data and public engagement.</p>
                 <div class="project-tags">
                     <span class="tag">UI/UX</span>
                     <span class="tag">Environment</span>
@@ -122,10 +131,11 @@
             </div>
 
             <!-- Project: Intranet Institucional CAS -->
-            <div class="project-card reveal">
+            <div class="project-card">
                 <div class="project-status">Institutional</div>
                 <h3>Intranet Institucional (CAS)</h3>
-                <p>Robust internal platform developed for the Corporación Autónoma Regional de Santander. Streamlines administrative workflows, employee communication, and internal resource management.</p>
+                <p>Robust internal platform developed for the Corporación Autónoma Regional de Santander. Streamlines
+                    administrative workflows, employee communication, and internal resource management.</p>
                 <div class="project-tags">
                     <span class="tag">Enterprise</span>
                     <span class="tag">PHP</span>
@@ -134,9 +144,10 @@
             </div>
 
             <!-- Project: SGI & MECI -->
-            <div class="project-card reveal">
+            <div class="project-card">
                 <h3>Institutional Control (SGI/MECI)</h3>
-                <p>Integrated system for Strategic Planning and Support Processes. Features MD5-secured document management and automated CRUD workflows for institutional compliance.</p>
+                <p>Integrated system for Strategic Planning and Support Processes. Features MD5-secured document
+                    management and automated CRUD workflows for institutional compliance.</p>
                 <div class="project-tags">
                     <span class="tag">Security</span>
                     <span class="tag">Architecture</span>
@@ -145,9 +156,10 @@
             </div>
 
             <!-- Project: Environmental Dashboard -->
-            <div class="project-card reveal">
+            <div class="project-card">
                 <h3>Environmental Monitoring Dashboard</h3>
-                <p>High-performance dashboard for real-time tracking of PM2.5, humidity, and temperature. Features RBAC security and local-first data processing.</p>
+                <p>High-performance dashboard for real-time tracking of PM2.5, humidity, and temperature. Features RBAC
+                    security and local-first data processing.</p>
                 <div class="project-tags">
                     <span class="tag">Data Viz</span>
                     <span class="tag">IoT</span>
@@ -156,9 +168,10 @@
             </div>
 
             <!-- Existing: Driver Fatigue Detection -->
-            <div class="project-card reveal">
+            <div class="project-card">
                 <h3>Driver Fatigue Detection</h3>
-                <p>Computer Vision system using MediaPipe and OpenCV to detect microsleep and yawning in real-time to prevent road accidents.</p>
+                <p>Computer Vision system using MediaPipe and OpenCV to detect microsleep and yawning in real-time to
+                    prevent road accidents.</p>
                 <div class="project-tags">
                     <span class="tag">AI</span>
                     <span class="tag">Python</span>
@@ -167,9 +180,10 @@
             </div>
 
             <!-- Existing: IoT Smart Agriculture -->
-            <div class="project-card reveal">
+            <div class="project-card">
                 <h3>Hypocalcemia Monitoring (IoT)</h3>
-                <p>Smart agriculture solution using ESP32 sensors and Node-RED dashboards for real-time monitoring and alerts.</p>
+                <p>Smart agriculture solution using ESP32 sensors and Node-RED dashboards for real-time monitoring and
+                    alerts.</p>
                 <div class="project-tags">
                     <span class="tag">IoT</span>
                     <span class="tag">ESP32</span>
@@ -183,16 +197,19 @@
     <section id="github" class="container">
         <h2 class="section-title reveal">GitHub Analytics</h2>
         <div class="github-stats reveal">
-            <img src="https://github-readme-stats.vercel.app/api?username=HayderFino&show_icons=true&theme=tokyonight&hide_border=true" alt="Stats" style="width: 100%; max-width: 500px; margin: 0 auto; display: block;">
+            <img src="https://github-readme-stats.vercel.app/api?username=HayderFino&show_icons=true&theme=tokyonight&hide_border=true"
+                alt="Stats" style="width: 100%; max-width: 500px; margin: 0 auto; display: block;">
         </div>
     </section>
 
     <section id="contact" class="container">
         <h2 class="section-title reveal">Let's Connect</h2>
         <div class="profile-content reveal" style="text-align: center;">
-            <p>I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision.</p>
+            <p>I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision.
+            </p>
             <div class="cta-group">
-                <a href="https://www.linkedin.com/in/hayder-fino-605564336" target="_blank" class="btn-primary">Connect on LinkedIn</a>
+                <a href="https://www.linkedin.com/in/hayder-fino-605564336" target="_blank" class="btn-primary">Connect
+                    on LinkedIn</a>
             </div>
         </div>
     </section>
@@ -210,4 +227,5 @@
     <script src="js/scene3d.js"></script>
     <script src="js/main.js"></script>
 </body>
+
 </html>

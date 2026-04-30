@@ -37,15 +37,16 @@ const material = new THREE.PointsMaterial({
 const points = new THREE.Points(geometry, material);
 scene.add(points);
 
-// Sphere Wireframe for center
-const sphereGeom = new THREE.SphereGeometry(2, 32, 32);
+// Sphere Wireframe - Moved to the right and made smaller
+const sphereGeom = new THREE.SphereGeometry(1.5, 32, 32);
 const sphereMat = new THREE.MeshBasicMaterial({
     color: 0x7000ff,
     wireframe: true,
     transparent: true,
-    opacity: 0.1
+    opacity: 0.05 // Even more subtle
 });
 const sphere = new THREE.Mesh(sphereGeom, sphereMat);
+sphere.position.x = 2; // Move to the right
 scene.add(sphere);
 
 camera.position.z = 5;
@@ -70,18 +71,21 @@ window.addEventListener('resize', () => {
 const animate = () => {
     requestAnimationFrame(animate);
 
-    points.rotation.y += 0.001;
-    points.rotation.x += 0.0005;
+    points.rotation.y += 0.0008; // Slower rotation
+    points.rotation.x += 0.0004;
 
-    sphere.rotation.y -= 0.002;
-    sphere.rotation.x -= 0.001;
+    sphere.rotation.y -= 0.001;
+    sphere.rotation.x -= 0.0005;
 
-    // Subtle parallax
-    points.position.x += (mouseX * 0.5 - points.position.x) * 0.05;
-    points.position.y += (-mouseY * 0.5 - points.position.y) * 0.05;
+    // Parallax effect - Sphere follows mouse but stays more to the right
+    const targetX = mouseX * 2 + 2; 
+    const targetY = -mouseY * 2;
     
-    sphere.position.x += (mouseX * 0.3 - sphere.position.x) * 0.05;
-    sphere.position.y += (-mouseY * 0.3 - sphere.position.y) * 0.05;
+    sphere.position.x += (targetX - sphere.position.x) * 0.05;
+    sphere.position.y += (targetY - sphere.position.y) * 0.05;
+    
+    points.position.x += (mouseX * 1 - points.position.x) * 0.05;
+    points.position.y += (-mouseY * 1 - points.position.y) * 0.05;
 
     renderer.render(scene, camera);
 };
