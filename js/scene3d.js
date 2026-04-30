@@ -1,5 +1,5 @@
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000); // Increased far plane
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector('#bg-canvas'),
     antialias: true,
@@ -8,10 +8,10 @@ const renderer = new THREE.WebGLRenderer({
 
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-camera.position.z = 5;
+camera.position.z = 10; // Moved camera back for wider view
 
-// Sphere (Wireframe Cyan)
-const sphereGeom = new THREE.SphereGeometry(1.5, 32, 32);
+// Sphere
+const sphereGeom = new THREE.SphereGeometry(2, 32, 32);
 const sphereMat = new THREE.MeshBasicMaterial({
     color: 0x00f2ff,
     wireframe: true,
@@ -27,24 +27,30 @@ const tabId = Math.random().toString(36).substr(2, 9);
 const otherTabs = new Map();
 const lightningGroups = new Map();
 
-const getScreenPos = () => ({
-    id: tabId,
-    centerX: (window.screenX || window.screenLeft) + window.innerWidth / 2,
-    centerY: (window.screenY || window.screenTop) + window.innerHeight / 2
-});
+const getScreenPos = () => {
+    const dpr = window.devicePixelRatio || 1;
+    return {
+        id: tabId,
+        centerX: (window.screenX || window.screenLeft) + (window.innerWidth / 2),
+        centerY: (window.screenY || window.screenTop) + (window.innerHeight / 2),
+        dpr: dpr
+    };
+};
 
 const boltMat = new THREE.LineBasicMaterial({ 
     color: 0x00f2ff, 
     transparent: true, 
-    opacity: 0.8
+    opacity: 0.9,
+    linewidth: 3
 });
 
-const createBoltPoints = (dx, dy, segments = 12) => {
+const createBoltPoints = (dx, dy, segments = 16) => {
     const points = [];
     points.push(new THREE.Vector3(0, 0, 0));
     for (let i = 1; i < segments; i++) {
         const t = i / segments;
-        const jitter = 0.5;
+        // Jitter scales with length
+        const jitter = 0.8;
         const px = dx * t + (Math.random() - 0.5) * jitter;
         const py = dy * t + (Math.random() - 0.5) * jitter;
         points.push(new THREE.Vector3(px, py, 0));
@@ -72,7 +78,7 @@ setInterval(() => {
             otherTabs.delete(id);
         }
     }
-}, 100);
+}, 50); // Faster broadcast
 
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -84,17 +90,12 @@ const animate = () => {
     requestAnimationFrame(animate);
     
     sphere.rotation.y += 0.005;
-    sphere.rotation.x += 0.002;
-
     const myPos = getScreenPos();
     
-    // If we have other tabs, make the sphere more "active"
     if (otherTabs.size > 0) {
-        sphere.material.opacity = 0.3;
-        sphere.scale.set(1.1, 1.1, 1.1);
+        sphere.material.opacity = 0.4;
     } else {
         sphere.material.opacity = 0.15;
-        sphere.scale.set(1, 1, 1);
     }
 
     otherTabs.forEach((data, id) => {
@@ -105,12 +106,14 @@ const animate = () => {
             scene.add(group);
         }
 
-        const scale = 0.01; 
+        // The key is the scale: How many pixels per 3D unit.
+        // We'll use a more aggressive scale to make rays LONG.
+        const scale = 0.025; 
         const dx = (data.centerX - myPos.centerX) * scale;
         const dy = -(data.centerY - myPos.centerY) * scale;
         const dist = Math.sqrt(dx*dx + dy*dy);
 
-        const targetCount = Math.floor(Math.max(1, 12 - dist * 1.5));
+        const targetCount = Math.floor(Math.max(2, 15 - dist * 0.5));
         
         while (group.children.length < targetCount) {
             const line = new THREE.Line(new THREE.BufferGeometry(), boltMat.clone());
@@ -123,7 +126,7 @@ const animate = () => {
         group.children.forEach((line) => {
             line.geometry.setFromPoints(createBoltPoints(dx, dy));
             line.geometry.attributes.position.needsUpdate = true;
-            line.material.opacity = Math.random() > 0.2 ? 0.9 : 0.1;
+            line.material.opacity = Math.random() > 0.1 ? 0.9 : 0.05;
         });
     });
 
