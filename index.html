@@ -10,8 +10,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="icon" type="image/png" href="img/favicon.png">
+    
+    <!-- 3D Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
+    <!-- 3D Background for Lightning -->
+    <canvas id="bg-canvas"></canvas>
+
     <nav>
         <div class="container nav-content">
             <div class="logo">HFINO</div>
@@ -167,5 +173,7 @@
             </div>
         </div>
     </footer>
+
+    <script src="js/scene3d.js"></script>
 </body>
 </html>
