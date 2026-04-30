@@ -3,14 +3,14 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector('#bg-canvas'),
     antialias: true,
-    alpha: true
+    alpha: true,
+    powerPreference: "high-performance" // Hint for browser priority
 });
 
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 camera.position.z = 15;
 
-// Sphere
 const sphereGeom = new THREE.SphereGeometry(2, 32, 32);
 const sphereMat = new THREE.MeshBasicMaterial({
     color: 0x00f2ff,
@@ -21,7 +21,6 @@ const sphereMat = new THREE.MeshBasicMaterial({
 const sphere = new THREE.Mesh(sphereGeom, sphereMat);
 scene.add(sphere);
 
-// Persistent Communication Channels
 const bc = new BroadcastChannel('portfolio_sync');
 const tabId = Math.random().toString(36).substr(2, 9);
 const otherTabs = new Map();
@@ -29,31 +28,12 @@ const lightningGroups = new Map();
 
 const getScreenPos = () => ({
     id: tabId,
-    centerX: (window.screenX || window.screenLeft || 0) + (window.innerWidth / 2),
-    centerY: (window.screenY || window.screenTop || 0) + (window.innerHeight / 2),
+    centerX: (window.screenLeft !== undefined ? window.screenLeft : window.screenX) + (window.innerWidth / 2),
+    centerY: (window.screenTop !== undefined ? window.screenTop : window.screenY) + (window.innerHeight / 2),
     time: Date.now()
 });
 
-// Broadcast Loop
-setInterval(() => {
-    const data = getScreenPos();
-    bc.postMessage(data);
-    localStorage.setItem('portfolio_sync_data', JSON.stringify(data));
-    
-    // Cleanup
-    const now = Date.now();
-    for (const [id, data] of otherTabs.entries()) {
-        if (now - data.lastUpdate > 2000) {
-            if (lightningGroups.has(id)) {
-                scene.remove(lightningGroups.get(id));
-                lightningGroups.delete(id);
-            }
-            otherTabs.delete(id);
-        }
-    }
-}, 100);
-
-// Unified Handler
+// Communication Handlers
 const handleSync = (data) => {
     if (data && data.id !== tabId) {
         otherTabs.set(data.id, { ...data, lastUpdate: Date.now() });
@@ -67,7 +47,6 @@ window.addEventListener('storage', (e) => {
     }
 });
 
-// Rendering Logic
 const boltMat = new THREE.LineBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 1 });
 
 const createBoltPoints = (dx, dy, segments = 20) => {
@@ -75,7 +54,7 @@ const createBoltPoints = (dx, dy, segments = 20) => {
     points.push(new THREE.Vector3(0, 0, 0));
     for (let i = 1; i < segments; i++) {
         const t = i / segments;
-        const jitter = 1.5;
+        const jitter = 1.6;
         points.push(new THREE.Vector3(
             dx * t + (Math.random() - 0.5) * jitter,
             dy * t + (Math.random() - 0.5) * jitter,
@@ -92,14 +71,33 @@ window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
+// Animation & Sync Loop
 const animate = () => {
     requestAnimationFrame(animate);
-    sphere.rotation.y += 0.005;
-    const myPos = getScreenPos();
     
+    // Broadcast position every frame (high priority)
+    const myPos = getScreenPos();
+    bc.postMessage(myPos);
+    // LocalStorage update is heavier, do it less often
+    if (Math.random() > 0.9) {
+        localStorage.setItem('portfolio_sync_data', JSON.stringify(myPos));
+    }
+
+    sphere.rotation.y += 0.005;
     sphere.material.opacity = otherTabs.size > 0 ? 0.5 : 0.15;
 
+    const now = Date.now();
     otherTabs.forEach((data, id) => {
+        // Cleanup old tabs
+        if (now - data.lastUpdate > 1500) {
+            if (lightningGroups.has(id)) {
+                scene.remove(lightningGroups.get(id));
+                lightningGroups.delete(id);
+            }
+            otherTabs.delete(id);
+            return;
+        }
+
         let group = lightningGroups.get(id);
         if (!group) {
             group = new THREE.Group();
