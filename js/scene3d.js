@@ -21,62 +21,55 @@ const sphereMat = new THREE.MeshBasicMaterial({
 const sphere = new THREE.Mesh(sphereGeom, sphereMat);
 scene.add(sphere);
 
-// Cross-Tab Logic
-const channel = new BroadcastChannel('portfolio_sync');
+// Cross-Tab Communication (Hybrid: BroadcastChannel + LocalStorage fallback)
 const tabId = Math.random().toString(36).substr(2, 9);
 const otherTabs = new Map();
 const lightningGroups = new Map();
 
-const getScreenPos = () => {
-    return {
-        id: tabId,
-        centerX: window.screenX + (window.innerWidth / 2),
-        centerY: window.screenY + (window.innerHeight / 2),
-        timestamp: Date.now()
-    };
-};
-
-const boltMat = new THREE.LineBasicMaterial({ 
-    color: 0x00f2ff, 
-    transparent: true, 
-    opacity: 1,
-    linewidth: 4
+const getScreenPos = () => ({
+    id: tabId,
+    centerX: (window.screenX || window.screenLeft || 0) + (window.innerWidth / 2),
+    centerY: (window.screenY || window.screenTop || 0) + (window.innerHeight / 2),
+    w: window.innerWidth,
+    h: window.innerHeight,
+    time: Date.now()
 });
 
-const createBoltPoints = (dx, dy, segments = 20) => {
-    const points = [];
-    points.push(new THREE.Vector3(0, 0, 0));
-    for (let i = 1; i < segments; i++) {
-        const t = i / segments;
-        const jitter = 1.2;
-        const px = dx * t + (Math.random() - 0.5) * jitter;
-        const py = dy * t + (Math.random() - 0.5) * jitter;
-        const pz = (Math.random() - 0.5) * jitter;
-        points.push(new THREE.Vector3(px, py, pz));
-    }
-    points.push(new THREE.Vector3(dx, dy, 0));
-    return points;
+const broadcast = (data) => {
+    // Method 1: BroadcastChannel
+    try {
+        const bc = new BroadcastChannel('portfolio_sync');
+        bc.postMessage(data);
+        bc.close();
+    } catch(e) {}
+    
+    // Method 2: LocalStorage (Fallback/Double check)
+    localStorage.setItem('portfolio_sync_data', JSON.stringify(data));
 };
 
-channel.onmessage = (event) => {
-    const data = event.data;
+// Listeners
+try {
+    const bc = new BroadcastChannel('portfolio_sync');
+    bc.onmessage = (e) => handleSync(e.data);
+} catch(e) {}
+
+window.addEventListener('storage', (e) => {
+    if (e.key === 'portfolio_sync_data' && e.newValue) {
+        handleSync(JSON.parse(e.newValue));
+    }
+});
+
+const handleSync = (data) => {
     if (data.id !== tabId) {
         otherTabs.set(data.id, { ...data, lastUpdate: Date.now() });
-        // Immediate response for handshake
-        if (data.type === 'HELO') {
-            channel.postMessage({ ...getScreenPos(), type: 'ACK' });
-        }
     }
 };
 
-// Initial HELO to find existing tabs
-channel.postMessage({ ...getScreenPos(), type: 'HELO' });
-
 setInterval(() => {
-    channel.postMessage(getScreenPos());
+    broadcast(getScreenPos());
     const now = Date.now();
     for (const [id, data] of otherTabs.entries()) {
-        if (now - data.lastUpdate > 1500) {
+        if (now - data.lastUpdate > 2000) {
             if (lightningGroups.has(id)) {
                 scene.remove(lightningGroups.get(id));
                 lightningGroups.delete(id);
@@ -84,7 +77,23 @@ setInterval(() => {
             otherTabs.delete(id);
         }
     }
-}, 50);
+}, 100);
+
+const boltMat = new THREE.LineBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 1 });
+
+const createBoltPoints = (dx, dy, segments = 20) => {
+    const points = [];
+    points.push(new THREE.Vector3(0, 0, 0));
+    for (let i = 1; i < segments; i++) {
+        const t = i / segments;
+        const jitter = 1.5;
+        const px = dx * t + (Math.random() - 0.5) * jitter;
+        const py = dy * t + (Math.random() - 0.5) * jitter;
+        points.push(new THREE.Vector3(px, py, (Math.random()-0.5)*jitter));
+    }
+    points.push(new THREE.Vector3(dx, dy, 0));
+    return points;
+};
 
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -99,10 +108,8 @@ const animate = () => {
     
     if (otherTabs.size > 0) {
         sphere.material.opacity = 0.5;
-        sphere.scale.set(1.1, 1.1, 1.1);
     } else {
         sphere.material.opacity = 0.15;
-        sphere.scale.set(1, 1, 1);
     }
 
     otherTabs.forEach((data, id) => {
@@ -113,18 +120,12 @@ const animate = () => {
             scene.add(group);
         }
 
-        // Corrected Direction:
-        // Screen X increases to the right. 
-        // If data.centerX > myPos.centerX, other tab is to the RIGHT.
-        // In Three.js, +X is RIGHT. So (data - myPos) is CORRECT.
-        // If it was pointing away, it means the coordinate system or scale was confusing.
-        // We use a stronger scale to make them cross windows.
-        const scale = 0.04; 
+        const scale = 0.05; 
         const dx = (data.centerX - myPos.centerX) * scale;
-        const dy = -(data.centerY - myPos.centerY) * scale; 
+        const dy = -(data.centerY - myPos.centerY) * scale;
         const dist = Math.sqrt(dx*dx + dy*dy);
 
-        const targetCount = Math.floor(Math.max(3, 20 - dist * 0.5));
+        const targetCount = Math.floor(Math.max(3, 15 - dist * 0.5));
         
         while (group.children.length < targetCount) {
             const line = new THREE.Line(new THREE.BufferGeometry(), boltMat.clone());
