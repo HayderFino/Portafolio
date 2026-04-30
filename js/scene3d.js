@@ -21,7 +21,8 @@ const sphereMat = new THREE.MeshBasicMaterial({
 const sphere = new THREE.Mesh(sphereGeom, sphereMat);
 scene.add(sphere);
 
-// Cross-Tab Communication (Hybrid: BroadcastChannel + LocalStorage fallback)
+// Persistent Communication Channels
+const bc = new BroadcastChannel('portfolio_sync');
 const tabId = Math.random().toString(36).substr(2, 9);
 const otherTabs = new Map();
 const lightningGroups = new Map();
@@ -30,43 +31,16 @@ const getScreenPos = () => ({
     id: tabId,
     centerX: (window.screenX || window.screenLeft || 0) + (window.innerWidth / 2),
     centerY: (window.screenY || window.screenTop || 0) + (window.innerHeight / 2),
-    w: window.innerWidth,
-    h: window.innerHeight,
     time: Date.now()
 });
 
-const broadcast = (data) => {
-    // Method 1: BroadcastChannel
-    try {
-        const bc = new BroadcastChannel('portfolio_sync');
-        bc.postMessage(data);
-        bc.close();
-    } catch(e) {}
-    
-    // Method 2: LocalStorage (Fallback/Double check)
-    localStorage.setItem('portfolio_sync_data', JSON.stringify(data));
-};
-
-// Listeners
-try {
-    const bc = new BroadcastChannel('portfolio_sync');
-    bc.onmessage = (e) => handleSync(e.data);
-} catch(e) {}
-
-window.addEventListener('storage', (e) => {
-    if (e.key === 'portfolio_sync_data' && e.newValue) {
-        handleSync(JSON.parse(e.newValue));
-    }
-});
-
-const handleSync = (data) => {
-    if (data.id !== tabId) {
-        otherTabs.set(data.id, { ...data, lastUpdate: Date.now() });
-    }
-};
-
+// Broadcast Loop
 setInterval(() => {
-    broadcast(getScreenPos());
+    const data = getScreenPos();
+    bc.postMessage(data);
+    localStorage.setItem('portfolio_sync_data', JSON.stringify(data));
+    
+    // Cleanup
     const now = Date.now();
     for (const [id, data] of otherTabs.entries()) {
         if (now - data.lastUpdate > 2000) {
@@ -79,6 +53,21 @@ setInterval(() => {
     }
 }, 100);
 
+// Unified Handler
+const handleSync = (data) => {
+    if (data && data.id !== tabId) {
+        otherTabs.set(data.id, { ...data, lastUpdate: Date.now() });
+    }
+};
+
+bc.onmessage = (e) => handleSync(e.data);
+window.addEventListener('storage', (e) => {
+    if (e.key === 'portfolio_sync_data' && e.newValue) {
+        handleSync(JSON.parse(e.newValue));
+    }
+});
+
+// Rendering Logic
 const boltMat = new THREE.LineBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 1 });
 
 const createBoltPoints = (dx, dy, segments = 20) => {
@@ -87,9 +76,11 @@ const createBoltPoints = (dx, dy, segments = 20) => {
     for (let i = 1; i < segments; i++) {
         const t = i / segments;
         const jitter = 1.5;
-        const px = dx * t + (Math.random() - 0.5) * jitter;
-        const py = dy * t + (Math.random() - 0.5) * jitter;
-        points.push(new THREE.Vector3(px, py, (Math.random()-0.5)*jitter));
+        points.push(new THREE.Vector3(
+            dx * t + (Math.random() - 0.5) * jitter,
+            dy * t + (Math.random() - 0.5) * jitter,
+            (Math.random() - 0.5) * jitter
+        ));
     }
     points.push(new THREE.Vector3(dx, dy, 0));
     return points;
@@ -106,11 +97,7 @@ const animate = () => {
     sphere.rotation.y += 0.005;
     const myPos = getScreenPos();
     
-    if (otherTabs.size > 0) {
-        sphere.material.opacity = 0.5;
-    } else {
-        sphere.material.opacity = 0.15;
-    }
+    sphere.material.opacity = otherTabs.size > 0 ? 0.5 : 0.15;
 
     otherTabs.forEach((data, id) => {
         let group = lightningGroups.get(id);
@@ -128,8 +115,7 @@ const animate = () => {
         const targetCount = Math.floor(Math.max(3, 15 - dist * 0.5));
         
         while (group.children.length < targetCount) {
-            const line = new THREE.Line(new THREE.BufferGeometry(), boltMat.clone());
-            group.add(line);
+            group.add(new THREE.Line(new THREE.BufferGeometry(), boltMat.clone()));
         }
         while (group.children.length > targetCount) {
             group.remove(group.children[group.children.length - 1]);
