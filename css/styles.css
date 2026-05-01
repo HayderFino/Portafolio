@@ -124,6 +124,8 @@ nav {
     border-radius: 24px;
     transition: transform 0.1s ease, border-color 0.3s ease, background 0.3s ease;
     transform-style: preserve-3d;
+    display: flex;
+    flex-direction: column;
 }
 
 .project-card:hover {
@@ -147,7 +149,25 @@ nav {
 
 .project-card p {
     color: var(--text-muted);
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-top: auto;
+}
+
+.tag {
+    background: rgba(0, 242, 255, 0.1);
+    color: var(--accent-primary);
+    padding: 0.4rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid rgba(0, 242, 255, 0.2);
+    white-space: nowrap;
 }
 
 .tech-grid {
