@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (urlParams.has('canvas')) {
         const canvas = document.getElementById('bg-canvas');
         if (canvas) {
-            canvas.style.display = 'block';
+            canvas.style.opacity = '1';
+            canvas.style.pointerEvents = 'auto'; // Optional, but usually good to keep auto if you want clicks
             console.log("⚡ 3D Engine Activated (Easter Egg)");
         }
     }
