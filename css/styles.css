@@ -25,6 +25,7 @@ body {
     color: var(--text-main);
     line-height: 1.6;
     overflow-x: hidden;
+    perspective: 1500px; /* Global 3D Perspective */
 }
 
 .container {
@@ -138,10 +139,11 @@ nav {
     border: 1px solid #222;
     padding: 2.5rem;
     border-radius: 20px;
-    transition: transform 0.1s ease, border-color 0.3s ease;
+    transition: border-color 0.3s ease; /* Transform handled by JS */
     position: relative;
     overflow: hidden;
     transform-style: preserve-3d;
+    will-change: transform;
 }
 
 .project-card::after {
