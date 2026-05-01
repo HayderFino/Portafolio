@@ -1,4 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Easter Egg: Activate 3D Canvas with ?canvas in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('canvas')) {
+        const canvas = document.getElementById('bg-canvas');
+        if (canvas) {
+            canvas.style.display = 'block';
+            console.log("⚡ 3D Engine Activated (Easter Egg)");
+        }
+    }
+
     const cards = document.querySelectorAll('.project-card');
 
     cards.forEach(card => {
