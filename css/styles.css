@@ -96,6 +96,24 @@ nav {
     color: var(--accent-primary);
 }
 
+@media (max-width: 768px) {
+    .hero {
+        padding-top: 120px;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .hero h1 {
+        font-size: 3rem;
+        margin-top: 2rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.1rem;
+        padding: 0 1rem;
+    }
+}
+
 .hero-subtitle {
     font-size: 1.5rem;
     color: var(--text-muted);
