@@ -23,6 +23,11 @@ body {
     overflow-x: hidden;
 }
 
+main {
+    position: relative;
+    z-index: 10; /* Asegura que el contenido esté sobre el canvas */
+}
+
 #bg-canvas {
     position: fixed;
     top: 0; left: 0;

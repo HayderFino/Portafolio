@@ -16,9 +16,10 @@ const sphereMat = new THREE.MeshBasicMaterial({
     color: 0x00f2ff,
     wireframe: true,
     transparent: true,
-    opacity: 0.15
+    opacity: 0.1 /* Más sutil */
 });
 const sphere = new THREE.Mesh(sphereGeom, sphereMat);
+sphere.position.y = 4; // La subimos para que enmarque el nombre
 scene.add(sphere);
 
 // Cross-Tab Logic
