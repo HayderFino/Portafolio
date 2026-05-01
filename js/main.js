@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Portfolio Loaded");
+    console.log("Portfolio Loaded v1.1");
 
     // Easter Egg: Activate 3D Canvas with ?canvas in URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -7,8 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (urlParams.has('canvas')) {
         if (canvas) {
-            canvas.style.opacity = '1';
-            canvas.style.pointerEvents = 'auto';
+            canvas.style.setProperty('display', 'block', 'important');
             console.log("⚡ 3D Engine Activated (Easter Egg)");
         }
     }
