@@ -3,8 +3,7 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector('#bg-canvas'),
     antialias: true,
-    alpha: true,
-    powerPreference: "high-performance" // Hint for browser priority
+    alpha: true
 });
 
 renderer.setPixelRatio(window.devicePixelRatio);
@@ -26,14 +25,20 @@ const tabId = Math.random().toString(36).substr(2, 9);
 const otherTabs = new Map();
 const lightningGroups = new Map();
 
-const getScreenPos = () => ({
-    id: tabId,
-    centerX: (window.screenLeft !== undefined ? window.screenLeft : window.screenX) + (window.innerWidth / 2),
-    centerY: (window.screenTop !== undefined ? window.screenTop : window.screenY) + (window.innerHeight / 2),
-    time: Date.now()
-});
+// High-robustness coordinate detection
+const getScreenPos = () => {
+    // Try multiple sources to bypass privacy shields
+    const x = window.screenLeft ?? window.screenX ?? window.screen.availLeft ?? 0;
+    const y = window.screenTop ?? window.screenY ?? window.screen.availTop ?? 0;
+    
+    return {
+        id: tabId,
+        centerX: x + (window.innerWidth / 2),
+        centerY: y + (window.innerHeight / 2),
+        time: Date.now()
+    };
+};
 
-// Communication Handlers
 const handleSync = (data) => {
     if (data && data.id !== tabId) {
         otherTabs.set(data.id, { ...data, lastUpdate: Date.now() });
@@ -54,7 +59,7 @@ const createBoltPoints = (dx, dy, segments = 20) => {
     points.push(new THREE.Vector3(0, 0, 0));
     for (let i = 1; i < segments; i++) {
         const t = i / segments;
-        const jitter = 1.6;
+        const jitter = 1.8;
         points.push(new THREE.Vector3(
             dx * t + (Math.random() - 0.5) * jitter,
             dy * t + (Math.random() - 0.5) * jitter,
@@ -71,14 +76,12 @@ window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// Animation & Sync Loop
 const animate = () => {
     requestAnimationFrame(animate);
     
-    // Broadcast position every frame (high priority)
     const myPos = getScreenPos();
     bc.postMessage(myPos);
-    // LocalStorage update is heavier, do it less often
+    
     if (Math.random() > 0.9) {
         localStorage.setItem('portfolio_sync_data', JSON.stringify(myPos));
     }
@@ -88,7 +91,6 @@ const animate = () => {
 
     const now = Date.now();
     otherTabs.forEach((data, id) => {
-        // Cleanup old tabs
         if (now - data.lastUpdate > 1500) {
             if (lightningGroups.has(id)) {
                 scene.remove(lightningGroups.get(id));
@@ -110,20 +112,27 @@ const animate = () => {
         const dy = -(data.centerY - myPos.centerY) * scale;
         const dist = Math.sqrt(dx*dx + dy*dy);
 
-        const targetCount = Math.floor(Math.max(3, 15 - dist * 0.5));
-        
-        while (group.children.length < targetCount) {
-            group.add(new THREE.Line(new THREE.BufferGeometry(), boltMat.clone()));
-        }
-        while (group.children.length > targetCount) {
-            group.remove(group.children[group.children.length - 1]);
-        }
+        // If distance is effectively 0 but it's another tab, 
+        // it means shields are blocking coordinates.
+        if (dist < 0.1 && data.id !== tabId) {
+            // Add a placeholder "searching" ray if blocked
+            const targetCount = 1;
+            group.children.forEach(l => l.material.opacity = 0);
+        } else {
+            const targetCount = Math.floor(Math.max(4, 20 - dist * 0.5));
+            while (group.children.length < targetCount) {
+                group.add(new THREE.Line(new THREE.BufferGeometry(), boltMat.clone()));
+            }
+            while (group.children.length > targetCount) {
+                group.remove(group.children[group.children.length - 1]);
+            }
 
-        group.children.forEach((line) => {
-            line.geometry.setFromPoints(createBoltPoints(dx, dy));
-            line.geometry.attributes.position.needsUpdate = true;
-            line.material.opacity = Math.random() > 0.1 ? 1 : 0.1;
-        });
+            group.children.forEach((line) => {
+                line.geometry.setFromPoints(createBoltPoints(dx, dy));
+                line.geometry.attributes.position.needsUpdate = true;
+                line.material.opacity = Math.random() > 0.1 ? 1 : 0.1;
+            });
+        }
     });
 
     renderer.render(scene, camera);
